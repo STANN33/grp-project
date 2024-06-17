@@ -1,0 +1,33 @@
+#include <codecvt>
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+const int max_sport_capacity=60;
+const int max_clubs_capacity=20;
+const double max_sport_male_percentage=0.75;
+const double max_sport_female_percentage=0.25;
+const double max_club_male_percentage=0.5;
+const double max_club_female_percentage=0.5;
+
+struct  student {
+      string name;
+      char gender;
+      vector<string>activities;
+
+   };
+struct sport {
+    string name;
+    int maxcapacity;
+    int currentmalecapacity;
+    int currentfemalecapacity;
+};
+struct club {
+    string name;
+    int maxcapacity;
+    int currentmalecapacity;
+    int currentfemalecapacity;
+};
+
+bool addstudenttosport() {
+}
