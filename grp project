@@ -1,33 +1,240 @@
-#include <codecvt>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <map>
+
 using namespace std;
-const int max_sport_capacity=60;
-const int max_clubs_capacity=20;
-const double max_sport_male_percentage=0.75;
-const double max_sport_female_percentage=0.25;
-const double max_club_male_percentage=0.5;
-const double max_club_female_percentage=0.5;
 
-struct  student {
-      string name;
-      char gender;
-      vector<string>activities;
-
-   };
-struct sport {
-    string name;
-    int maxcapacity;
-    int currentmalecapacity;
-    int currentfemalecapacity;
-};
-struct club {
-    string name;
-    int maxcapacity;
-    int currentmalecapacity;
-    int currentfemalecapacity;
+struct Student {
+    string firstname;
+    string surname;
+    string gender;
+    int age;
+    string group;
+    string sport;
+    vector<string> club;
 };
 
-bool addstudenttosport() {
+vector<Student> students;
+vector<string> sports = { "Rugby", "Athletics", "Swimming", "Soccer" };
+vector<string> clubs = { "Journalism Club", "Red Cross Society", "AISEC", "Business Club", "Computer Science Club" };
+
+map<string, int> clubCapacity;
+map<string, int> sportCapacity;
+map<string, int> clubMaleCount;
+map<string, int> clubFemaleCount;
+map<string, int> sportMaleCount;
+map<string, int> sportFemaleCount;
+
+void addstudents();
+void vstudents();
+void vclubs();
+void vsports();
+void grpstd();
+void save();
+
+int main() {
+
+    int choice;
+
+    clubCapacity["Journalism Club"] = 0;
+    clubCapacity["Red Cross Society"] = 0;
+    clubCapacity["AISEC"] = 0;
+    clubCapacity["Business Club"] = 0;
+    clubCapacity["Computer Science Club"] = 0;
+
+    sportCapacity["Rugby"] = 0;
+    sportCapacity["Athletics"] = 0;
+    sportCapacity["Swimming"] = 0;
+    sportCapacity["Soccer"] = 0;
+
+    clubMaleCount["Journalism Club"] = 0;
+    clubMaleCount["Red Cross Society"] = 0;
+    clubMaleCount["AISEC"] = 0;
+    clubMaleCount["Business Club"] = 0;
+    clubMaleCount["Computer Science Club"] = 0;
+
+    clubFemaleCount["Journalism Club"] = 0;
+    clubFemaleCount["Red Cross Society"] = 0;
+    clubFemaleCount["AISEC"] = 0;
+    clubFemaleCount["Business Club"] = 0;
+    clubFemaleCount["Computer Science Club"] = 0;
+
+    sportMaleCount["Rugby"] = 0;
+    sportMaleCount["Athletics"] = 0;
+    sportMaleCount["Swimming"] = 0;
+    sportMaleCount["Soccer"] = 0;
+
+    sportFemaleCount["Rugby"] = 0;
+    sportFemaleCount["Athletics"] = 0;
+    sportFemaleCount["Swimming"] = 0;
+    sportFemaleCount["Soccer"] = 0;
+
+    do {
+        cout << "*" << endl;
+        cout << "Co-curricular Activity Selection System\n";
+        cout << "1. Add Student\n";
+        cout << "2. View Students\n";
+        cout << "3. View Clubs/Societies\n";
+        cout << "4. View Sports\n";
+        cout << "5. View Grouped Students\n";
+        cout << "6. Save all Files\n";
+        cout << "7. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addstudents();
+            break;
+            case 2:
+                vstudents();
+            break;
+            case 3:
+                vclubs();
+            break;
+            case 4:
+                vsports();
+            break;
+            case 5:
+                grpstd();
+            break;
+            case 6:
+                save();
+            break;
+            case 7:
+                cout << "Exiting program...Thank You For Your Cooperation\n";
+                cout << "" << endl;
+            break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+            break;
+        }
+
+    } while (choice != 7);
+
+    return 0;
+}
+
+void addstudents() {
+    Student student;
+    cout << "*" << endl;
+    cout << "Welcome To Strathmore University as a BBIT Student First Year" << endl;
+    cout << "Enter student's first name: ";
+    cin >> student.firstname;
+    cout << "Enter student's surname: ";
+    cin >> student.surname;
+    cout << "Enter student's gender: ";
+    cin >> student.gender;
+    cout << "Enter student's age: ";
+    cin >> student.age;
+    cout << "Enter student's group: ";
+    cin >> student.group;
+    cout << "Enter desired club(Maximum of 3 but no Sport): ";
+    string club;
+    for (int i = 0; i < 3; i++) {
+        cin >> club;
+        student.club.push_back(club);
+    }
+    cout << "Enter student's sport(Maximum of 2 but no Club): ";
+    cin >> student.sport;
+
+    ofstream studentfile;
+    studentfile.open("students.csv", ios::trunc);
+
+    if (!studentfile) {
+        cerr << "Unable To Open File";
+    } else {
+        studentfile << student.firstname << "," << student.surname << "," << student.gender<< "," << student.age << "," << student.group << "," << student.sport;
+        for (string c : student.club) {
+            studentfile << "," << c;
+        }
+        studentfile << endl;
+    }
+
+    studentfile.close();
+    students.push_back(student);
+}
+
+void vstudents() {
+    string myfilepath = "students.csv";
+    ifstream studentfile;
+
+    studentfile.open(myfilepath);
+    if (studentfile.fail()) {
+        cerr << "Unable To Open File";
+    } else {
+        string records;
+        while (getline(studentfile, records, '\n')) {
+            cout << records << endl;
+        }
+    }
+    studentfile.close();
+}
+
+void vclubs() {
+    for (string club : clubs) {
+        cout << club << endl;
+    }
+}
+
+void vsports() {
+    for (string sport : sports) {
+        cout << sport << endl;
+    }
+}
+
+void addClub(Student& student, string club) {
+    if (student.sport.empty() && student.club.size() < 3) {
+        if (clubCapacity[club] < 60) {
+            if (clubMaleCount[club] < 30 || clubFemaleCount[club] < 30) {
+                student.club.push_back(club);
+                clubCapacity[club]++;
+                if (student.gender == "Male") {
+                    clubMaleCount[club]++;
+                } else {
+                    clubFemaleCount[club]++;
+                }
+            } else {
+                cout << "Club " << club << " has reached gender balance limit." << endl;
+            }
+        } else {
+            cout << "Club " << club << " has reached maximum capacity." << endl;
+        }
+    } else {
+        cout << "Student is already participating in a sport or has reached maximum club limit." << endl;
+    }
+}
+
+void addSport(Student& student, string sport) {
+    if (student.sport.empty() && student.club.size() < 2) {
+        if (sportCapacity[sport] < 20) {
+            if (sportMaleCount[sport] < 15 || sportFemaleCount[sport] < 15) {
+                student.sport = sport;
+                sportCapacity[sport]++;
+                if (student.gender == "Male") {
+                    sportMaleCount[sport]++;
+                } else {
+                    sportFemaleCount[sport]++;
+                }
+            } else {
+                cout << "Sport " << sport << " has reached gender limit." << endl;
+            }
+        } else {
+            cout << "Sport " << sport << " has reached maximum capacity." << endl;
+        }
+    } else {
+        cout << "Student is already participating in a sport or has reached maximum club limit." << endl;
+    }
+}
+
+void grpstd() {
+    for (Student student : students) {
+        cout << "Student: " << student.firstname << " " << student.surname <<student.group<< endl;
+    }
+}
+
+void save() {
+    cout<<"Saved the files"<<endl;
 }
